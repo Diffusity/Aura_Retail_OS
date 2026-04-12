@@ -1,34 +1,37 @@
 package aura.hardware;
 
-import aura.interfaces.IDispenser;
+import aura.events.EventBus;
+import aura.interfaces.IHardwareModule;
 
-// PATTERN: Proxy (Structural) — adds health checking before delegating to real Dispenser
-// STUB — full implementation in Phase 3 (Subtask 2)
-public class HardwareProxy implements IDispenser {
-    private final IDispenser realDispenser;
+import java.util.Map;
 
-    public HardwareProxy(IDispenser realDispenser) {
-        this.realDispenser = realDispenser;
+// PATTERN: Proxy (Structural) — checks hardware availability before delegating to real module
+// If unavailable: publishes HardwareFailureEvent; triggers Chain of Responsibility via MaintenanceService
+public class HardwareProxy implements IHardwareModule {
+    private final IHardwareModule realModule;
+    private boolean forcedUnavailable = false;
+
+    public HardwareProxy(IHardwareModule realModule) { this.realModule = realModule; }
+
+    @Override
+    public boolean isAvailable() {
+        if (forcedUnavailable) return false;
+        return realModule.isAvailable();
     }
 
     @Override
-    public boolean dispense(String productId, int quantity) {
-        if (!isOperational()) {
-            System.out.println("[HardwareProxy] Health check failed — dispense blocked.");
-            return false;
+    public void initialize() {
+        if (isAvailable()) realModule.initialize();
+        else {
+            System.out.println("[HardwareProxy] Cannot initialize: module unavailable.");
+            EventBus.getInstance().publish("HardwareFailureEvent",
+                Map.of("component", getModuleType(), "reason", "UNAVAILABLE_ON_INIT"));
         }
-        System.out.println("[HardwareProxy] Health check passed — delegating dispense.");
-        return realDispenser.dispense(productId, quantity);
     }
 
-    @Override
-    public boolean isOperational() {
-        // TODO (Phase 3): integrate with hardware health monitoring
-        return realDispenser.isOperational();
-    }
+    // Allows tests and Scenario A to simulate hardware failure
+    public void setForcedUnavailable(boolean unavailable) { this.forcedUnavailable = unavailable; }
 
-    @Override
-    public void setImpl(aura.interfaces.IDispenserImpl impl) {
-        realDispenser.setImpl(impl);
-    }
+    @Override public String getModuleType() { return realModule.getModuleType(); }
+    @Override public void shutdown()        { if (realModule.isAvailable()) realModule.shutdown(); }
 }

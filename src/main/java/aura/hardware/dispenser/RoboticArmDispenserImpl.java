@@ -2,19 +2,13 @@ package aura.hardware.dispenser;
 
 import aura.interfaces.IDispenserImpl;
 
-// PATTERN: Bridge (ConcreteImplementor, Structural) — robotic arm retrieves items with precision positioning
+// PATTERN: Bridge (ConcreteImplementor, Structural)
 public class RoboticArmDispenserImpl implements IDispenserImpl {
     @Override
-    public boolean performDispense(String productId, int quantity) {
-        System.out.println("[RoboticArmDispenser] Robotic arm retrieving " + quantity + "x " + productId + ".");
+    public boolean performDispense(String productId, int qty) {
+        System.out.println("[RoboticArm] Extending arm to retrieve: " + productId + " qty=" + qty);
         return true;
     }
-
-    @Override
-    public void calibrate() {
-        System.out.println("[RoboticArmDispenser] Calibrating arm joints and gripper...");
-    }
-
-    @Override
-    public String getHardwareType() { return "RoboticArmDispenser"; }
+    @Override public void calibrate() { System.out.println("[RoboticArm] Running arm calibration sequence..."); }
+    @Override public String getHardwareType() { return "ROBOTIC_ARM"; }
 }

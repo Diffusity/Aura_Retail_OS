@@ -1,5 +1,6 @@
 package aura.registry;
 
+import aura.kiosk.BaseKiosk;
 import aura.persistence.PersistenceManager;
 
 import java.util.Collections;
@@ -9,8 +10,8 @@ import java.util.Map;
 // PATTERN: Singleton (Creational) — one global store for system-wide configuration and kiosk references
 public class CentralRegistry {
     private static volatile CentralRegistry instance;
-    private final Map<String, Object> config = new HashMap<>();
-    private final Map<String, Object> registeredKiosks = new HashMap<>(); // Using Object to avoid forward ref to BaseKiosk
+    private final Map<String, Object>    config            = new HashMap<>();
+    private final Map<String, BaseKiosk> registeredKiosks  = new HashMap<>();
     private String systemMode = "NORMAL"; // NORMAL | EMERGENCY
 
     private CentralRegistry() {
@@ -27,9 +28,9 @@ public class CentralRegistry {
         return instance;
     }
 
-    public void registerKiosk(String id, Object kiosk) { registeredKiosks.put(id, kiosk); }
-    public Object getKiosk(String id) { return registeredKiosks.get(id); }
-    public Map<String, Object> getAllKiosks() { return Collections.unmodifiableMap(registeredKiosks); }
+    public void registerKiosk(String id, BaseKiosk kiosk) { registeredKiosks.put(id, kiosk); }
+    public BaseKiosk getKiosk(String id)                  { return registeredKiosks.get(id); }
+    public Map<String, BaseKiosk> getAllKiosks()           { return Collections.unmodifiableMap(registeredKiosks); }
 
     public void setSystemMode(String mode) {
         this.systemMode = mode;
