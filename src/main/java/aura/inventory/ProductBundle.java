@@ -3,48 +3,49 @@ package aura.inventory;
 import aura.interfaces.IInventoryItem;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
-// PATTERN: Composite (Composite Node, Structural) — bundle of products/sub-bundles
-// isAvailable() propagates: bundle is available only if ALL children are available
-// STUB — full implementation in Phase 4 (Subtask 2)
+// PATTERN: Composite (Composite Node, Structural) — contains bundles and/or products
+// Availability and stock propagate recursively from all children
 public class ProductBundle implements IInventoryItem {
     private final String id;
     private final String name;
-    private final double basePrice;
     private final List<IInventoryItem> children = new ArrayList<>();
+    private double bundleDiscount = 0.0;
 
-    public ProductBundle(String id, String name, double basePrice) {
-        this.id = id;
-        this.name = name;
-        this.basePrice = basePrice;
-    }
+    public ProductBundle(String id, String name) { this.id = id; this.name = name; }
 
-    @Override public String getId()   { return id; }
-    @Override public String getName() { return name; }
-    @Override public double getBasePrice() { return basePrice; }
+    @Override public void add(IInventoryItem item)    { children.add(item); }
+    @Override public void remove(IInventoryItem item) { children.remove(item); }
+    @Override public List<IInventoryItem> getChildren() { return Collections.unmodifiableList(children); }
 
+    // PATTERN: Composite — stock is min of all children's available stock
     @Override
     public int getAvailableStock() {
-        // Bundle stock = minimum stock across all children
-        return children.stream()
-                .mapToInt(IInventoryItem::getAvailableStock)
-                .min()
-                .orElse(0);
+        return children.stream().mapToInt(IInventoryItem::getAvailableStock).min().orElse(0);
     }
 
-    // PATTERN: Composite — recursive availability check propagates from leaf to root
+    // PATTERN: Composite — bundle is available only if ALL children are available
     @Override
     public boolean isAvailable() {
         return !children.isEmpty() && children.stream().allMatch(IInventoryItem::isAvailable);
     }
 
-    @Override public void add(IInventoryItem item)    { children.add(item); }
-    @Override public void remove(IInventoryItem item) { children.remove(item); }
-    @Override public List<IInventoryItem> getChildren() { return children; }
+    // PATTERN: Composite — price is sum of all children, minus bundle discount
+    @Override
+    public double getBasePrice() {
+        double total = children.stream().mapToDouble(IInventoryItem::getBasePrice).sum();
+        return total * (1.0 - bundleDiscount);
+    }
+
+    @Override public String getId()   { return id; }
+    @Override public String getName() { return name; }
+
+    public void setBundleDiscount(double d) { this.bundleDiscount = d; }
 
     @Override
     public String toString() {
-        return "ProductBundle{id='" + id + "', name='" + name + "', available=" + isAvailable() + ", children=" + children.size() + "}";
+        return name + " (bundle, available=" + isAvailable() + ", children=" + children.size() + ")";
     }
 }
