@@ -1,6 +1,7 @@
 package aura.persistence;
 
 import aura.interfaces.IInventoryItem;
+import aura.transaction.Transaction;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -59,13 +60,29 @@ public class PersistenceManager {
         return obj;
     }
 
-    // Append-only transaction log — requires a Transaction-like map for now
+    // Append-only transaction log using Transaction domain object
+    public void saveTransaction(Transaction t) {
+        List<Map<String, Object>> existing = loadTransactions();
+        JSONArray arr = new JSONArray();
+        existing.forEach(m -> arr.put(new JSONObject(m)));
+        JSONObject entry = new JSONObject();
+        entry.put("txnId", t.getTxnId());
+        entry.put("userId", t.getUserId());
+        entry.put("productId", t.getProductId());
+        entry.put("qty", t.getQty());
+        entry.put("amount", t.getAmount());
+        entry.put("status", t.getStatus());
+        entry.put("timestamp", t.getTimestamp());
+        arr.put(entry);
+        writeFile(TRANSACTIONS_FILE, arr.toString(2));
+    }
+
+    // Legacy map-based transaction save (kept for compatibility)
     public void saveTransactionMap(Map<String, Object> txn) {
         List<Map<String, Object>> existing = loadTransactions();
         JSONArray arr = new JSONArray();
         existing.forEach(m -> arr.put(new JSONObject(m)));
-        JSONObject entry = new JSONObject(txn);
-        arr.put(entry);
+        arr.put(new JSONObject(txn));
         writeFile(TRANSACTIONS_FILE, arr.toString(2));
     }
 
