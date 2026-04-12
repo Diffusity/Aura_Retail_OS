@@ -1,2 +1,20 @@
-.agents
-subTask-1
+# Maven build output
+target/
+
+# IDE files
+.idea/
+*.iml
+.vscode/
+*.classpath
+*.project
+.settings/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Data files (generated at runtime — keep seed structure, ignore runtime writes)
+# data/ is tracked (seed files committed), runtime content ignored via .gitkeep pattern
+
+# Logs
+*.log
