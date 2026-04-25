@@ -18,3 +18,12 @@ Thumbs.db
 
 # Logs
 *.log
+
+
+#others
+changes
+IMPLEMENTATION.md
+MASTER_IMPLEMENTATION_GUIDE.md
+SUBTASK_MILESTONES.md
+TEAM_CONTRIBUTIONS.md
+commit_plan.md
