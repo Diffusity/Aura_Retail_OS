@@ -1,6 +1,7 @@
 package aura.inventory;
 
 import aura.interfaces.IInventoryItem;
+import aura.hardware.HardwareProxy;
 
 import java.util.Collections;
 import java.util.List;
@@ -15,6 +16,7 @@ public class Product implements IInventoryItem {
     private int hardwareFaultCount = 0;  // items blocked due to hardware failure
     private final double basePrice;
     private boolean requiresRefrigeration = false;
+    private HardwareProxy refrigerationProxy = null;
 
     public Product(String id, String name, int stock, double price) {
         this.id = id;
@@ -29,7 +31,15 @@ public class Product implements IInventoryItem {
         return Math.max(0, stockCount - reservedCount - hardwareFaultCount);
     }
 
-    @Override public boolean isAvailable() { return getAvailableStock() > 0; }
+    public void setRefrigerationProxy(HardwareProxy proxy) { this.refrigerationProxy = proxy; }
+
+    @Override
+    public boolean isAvailable() {
+        if (requiresRefrigeration && refrigerationProxy != null && !refrigerationProxy.isAvailable()) {
+            return false;
+        }
+        return getAvailableStock() > 0;
+    }
 
     // Reservation lifecycle — supports atomic transaction pattern
     public void reserve(int qty)             { reservedCount += qty; }
