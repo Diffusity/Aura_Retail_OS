@@ -1,0 +1,5 @@
+[
+  {"kioskId":"F-001","type":"FoodKiosk","state":"ACTIVE","dispenserOperational":true},
+  {"kioskId":"P-001","type":"PharmacyKiosk","state":"ACTIVE","dispenserOperational":true},
+  {"kioskId":"E-001","type":"EmergencyReliefKiosk","state":"ACTIVE","dispenserOperational":true}
+]

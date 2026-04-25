@@ -1,0 +1,4 @@
+[
+  {"txnId":"TX-001","userId":"user1","productId":"FOOD-001","qty":2,"amount":7.00,"status":"COMPLETED","timestamp":1700000000000},
+  {"txnId":"TX-002","userId":"user2","productId":"MED-001","qty":1,"amount":1.50,"status":"COMPLETED","timestamp":1700000100000}
+]

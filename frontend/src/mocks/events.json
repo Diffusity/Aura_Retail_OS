@@ -1,0 +1,4 @@
+[
+  {"type":"TransactionCompletedEvent","data":{"txId":"TX-001","productId":"FOOD-001"},"timestamp":1700000000000},
+  {"type":"LowStockEvent","data":{"productId":"MED-001","remainingStock":3},"timestamp":1700000100000}
+]
