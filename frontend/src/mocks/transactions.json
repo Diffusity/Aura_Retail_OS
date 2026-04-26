@@ -1,4 +1,10 @@
 [
-  {"txnId":"TX-001","userId":"user1","productId":"FOOD-001","qty":2,"amount":7.00,"status":"COMPLETED","timestamp":1700000000000},
-  {"txnId":"TX-002","userId":"user2","productId":"MED-001","qty":1,"amount":1.50,"status":"COMPLETED","timestamp":1700000100000}
+  {"txnId":"TX-001","userId":"user1","productId":"FOOD-001","qty":2,"amount":7.00,"status":"COMPLETED","timestamp":1710000000000},
+  {"txnId":"TX-002","userId":"user2","productId":"MED-001","qty":1,"amount":1.50,"status":"COMPLETED","timestamp":1710000100000},
+  {"txnId":"TX-003","userId":"user3","productId":"FOOD-002","qty":3,"amount":6.00,"status":"REFUNDED","timestamp":1710000200000},
+  {"txnId":"TX-004","userId":"user4","productId":"EMG-001","qty":5,"amount":5.00,"status":"COMPLETED","timestamp":1710000300000},
+  {"txnId":"TX-005","userId":"user5","productId":"FOOD-001","qty":1,"amount":3.50,"status":"FAILED","timestamp":1710000400000},
+  {"txnId":"TX-006","userId":"user6","productId":"MED-002","qty":2,"amount":4.00,"status":"COMPLETED","timestamp":1710000500000},
+  {"txnId":"TX-007","userId":"user7","productId":"FOOD-002","qty":1,"amount":2.00,"status":"COMPLETED","timestamp":1710000600000},
+  {"txnId":"TX-008","userId":"user8","productId":"EMG-001","qty":2,"amount":2.00,"status":"COMPLETED","timestamp":1710000700000}
 ]

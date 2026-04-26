@@ -52,5 +52,14 @@
     "txnId": "e7b4e7e3-0b8e-4719-8911-c8ed7a3a4276",
     "status": "COMPLETED",
     "timestamp": 1777140980969
+  },
+  {
+    "amount": 3.15,
+    "productId": "FOOD-001",
+    "qty": 1,
+    "userId": "CUST-7064",
+    "txnId": "b1f664f6-f757-46ec-a596-9adc2bcb6bcf",
+    "status": "COMPLETED",
+    "timestamp": 1777201345011
   }
 ]

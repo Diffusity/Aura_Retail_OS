@@ -1,4 +1,8 @@
 [
-  {"type":"TransactionCompletedEvent","data":{"txId":"TX-001","productId":"FOOD-001"},"timestamp":1700000000000},
-  {"type":"LowStockEvent","data":{"productId":"MED-001","remainingStock":3},"timestamp":1700000100000}
+  {"type":"TransactionCompletedEvent","data":{"txId":"TX-001","productId":"FOOD-001","qty":2,"amount":7.00},"timestamp":1710000000000},
+  {"type":"LowStockEvent","data":{"productId":"MED-001","remainingStock":3},"timestamp":1710000100000},
+  {"type":"TransactionFailedEvent","data":{"reason":"PAYMENT_FAILED","txId":"TX-005"},"timestamp":1710000400000},
+  {"type":"HardwareFailureEvent","data":{"component":"RefrigerationUnit","kioskId":"F-001"},"timestamp":1710000800000},
+  {"type":"EmergencyModeActivatedEvent","data":{"activatedBy":"SYSTEM","timestamp":1710000900000},"timestamp":1710000900000},
+  {"type":"TransactionCompletedEvent","data":{"txId":"TX-008","productId":"EMG-001","qty":2,"amount":2.00},"timestamp":1710000700000}
 ]

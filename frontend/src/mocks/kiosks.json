@@ -1,5 +1,40 @@
 [
-  {"kioskId":"F-001","type":"FoodKiosk","state":"ACTIVE","dispenserOperational":true},
-  {"kioskId":"P-001","type":"PharmacyKiosk","state":"ACTIVE","dispenserOperational":true},
-  {"kioskId":"E-001","type":"EmergencyReliefKiosk","state":"ACTIVE","dispenserOperational":true}
+  {
+    "kioskId": "F-001",
+    "type": "FoodKiosk",
+    "typeName": "Food Kiosk",
+    "state": "ACTIVE",
+    "dispenserOperational": true,
+    "dispenserType": "SpiralDispenser",
+    "hardwareModules": ["BaseDispenser", "RefrigerationUnit"],
+    "inventory": [
+      {"id": "FOOD-001", "name": "Energy Bar", "stock": 50, "price": 3.50, "available": true},
+      {"id": "FOOD-002", "name": "Apple Juice", "stock": 30, "price": 2.00, "available": true}
+    ]
+  },
+  {
+    "kioskId": "P-001",
+    "type": "PharmacyKiosk",
+    "typeName": "Pharmacy Kiosk",
+    "state": "ACTIVE",
+    "dispenserOperational": true,
+    "dispenserType": "RoboticArmDispenser",
+    "hardwareModules": ["BaseDispenser"],
+    "inventory": [
+      {"id": "MED-001", "name": "Paracetamol", "stock": 20, "price": 1.50, "available": true},
+      {"id": "MED-002", "name": "Bandages", "stock": 40, "price": 2.00, "available": true}
+    ]
+  },
+  {
+    "kioskId": "E-001",
+    "type": "EmergencyReliefKiosk",
+    "typeName": "Emergency Relief Kiosk",
+    "state": "ACTIVE",
+    "dispenserOperational": true,
+    "dispenserType": "GravityFeedDispenser",
+    "hardwareModules": ["BaseDispenser", "SolarMonitor"],
+    "inventory": [
+      {"id": "EMG-001", "name": "Water Bottle", "stock": 100, "price": 1.00, "available": true}
+    ]
+  }
 ]

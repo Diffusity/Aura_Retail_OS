@@ -12,6 +12,8 @@ export const getEvents = () => MOCK ? Promise.resolve({ data: mockEvents }) : ap
 export const runScenario = (s) => MOCK ? Promise.resolve({ data: { success: true } }) : api.post(`/simulate/${s}`);
 export const getPayments = () => MOCK ? Promise.resolve({ data: [{ name: 'CreditCard' }, { name: 'DigitalWallet' }, { name: 'UPI' }] }) : api.get('/payments');
 export const getKioskDetail = (id) => MOCK ? Promise.resolve({ data: mockKiosks.find(k => k.kioskId === id) }) : api.get(`/kiosks/${id}`);
+export const getInventory = (kioskId) => MOCK ? Promise.resolve({ data: { inventory: mockKiosks.find(k => k.kioskId === kioskId)?.inventory || [] } }) : api.get(`/inventory/${kioskId}`);
+export const getSystemStatus = () => MOCK ? Promise.resolve({ data: { systemMode: 'NORMAL', uptimeSeconds: 1200, totalKiosks: 3, totalTransactions: 10 }}) : api.get('/system/status');
 export const toggleSystemMode = (mode) => MOCK ? Promise.resolve({ data: { systemMode: mode }}) : api.post('/system/mode', { mode });
 export const registerProvider = (name) => MOCK ? Promise.resolve({ data: { registered: name }}) : api.post('/payments/register', { providerName: name });
 export const refundTransaction = (id) => MOCK ? Promise.resolve({ data: { success: true }}) : api.post(`/transactions/${id}/refund`);
