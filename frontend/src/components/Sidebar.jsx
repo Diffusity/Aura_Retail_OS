@@ -1,31 +1,83 @@
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, Receipt, Play, CreditCard } from 'lucide-react';
+import { LayoutDashboard, Receipt, Play, CreditCard, Activity, Monitor } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { getSystemStatus } from '../api';
 
 export default function Sidebar() {
+  const [status, setStatus] = useState({ systemMode: 'NORMAL' });
+
+  useEffect(() => {
+    const fetchStatus = async () => {
+      try {
+        const res = await getSystemStatus();
+        setStatus(res.data);
+      } catch (e) {
+        // Silently fail, status will remain whatever it was
+      }
+    };
+    fetchStatus();
+    const interval = setInterval(fetchStatus, 5000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const navItems = [
+    { to: "/", icon: LayoutDashboard, label: "Dashboard" },
+    { to: "/transactions", icon: Receipt, label: "Transactions" },
+    { to: "/simulate", icon: Play, label: "Simulation" },
+    { to: "/payments", icon: CreditCard, label: "Payments" },
+    { to: "/emulator", icon: Monitor, label: "Emulator" }
+  ];
+
   return (
-    <div className="w-64 bg-slate-900 text-white flex flex-col">
-      <div className="p-6">
-        <h1 className="text-2xl font-bold tracking-wider text-blue-400">AURA</h1>
-        <p className="text-xs text-slate-400 mt-1 uppercase tracking-widest">Retail OS</p>
+    <div className="w-64 bg-[var(--surface)] border-r border-[var(--border-color)] flex flex-col transition-colors duration-300">
+      <div className="p-6 pb-2">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 bg-[var(--accent)] text-[var(--accent-text)] rounded flex items-center justify-center font-bold text-xl">
+            A
+          </div>
+          <div>
+            <h1 className="text-xl font-bold tracking-widest text-[var(--text-primary)]">AURA</h1>
+            <p className="text-[10px] text-[var(--text-secondary)] font-medium tracking-[0.2em] uppercase">Retail OS</p>
+          </div>
+        </div>
       </div>
-      <nav className="flex-1 px-4 space-y-2 mt-4">
-        <NavLink to="/" className={({ isActive }) => `flex items-center px-4 py-3 rounded-lg transition-colors ${isActive ? 'bg-blue-600 text-white' : 'text-slate-300 hover:bg-slate-800'}`}>
-          <LayoutDashboard className="w-5 h-5 mr-3" />
-          Dashboard
-        </NavLink>
-        <NavLink to="/transactions" className={({ isActive }) => `flex items-center px-4 py-3 rounded-lg transition-colors ${isActive ? 'bg-blue-600 text-white' : 'text-slate-300 hover:bg-slate-800'}`}>
-          <Receipt className="w-5 h-5 mr-3" />
-          Transactions
-        </NavLink>
-        <NavLink to="/simulate" className={({ isActive }) => `flex items-center px-4 py-3 rounded-lg transition-colors ${isActive ? 'bg-blue-600 text-white' : 'text-slate-300 hover:bg-slate-800'}`}>
-          <Play className="w-5 h-5 mr-3" />
-          Simulate
-        </NavLink>
-        <NavLink to="/payments" className={({ isActive }) => `flex items-center px-4 py-3 rounded-lg transition-colors ${isActive ? 'bg-blue-600 text-white' : 'text-slate-300 hover:bg-slate-800'}`}>
-          <CreditCard className="w-5 h-5 mr-3" />
-          Payments
-        </NavLink>
+      
+      <nav className="flex-1 px-4 mt-8 space-y-1">
+        {navItems.map((item) => (
+          <NavLink 
+            key={item.to}
+            to={item.to} 
+            className={({ isActive }) => `
+              flex items-center px-4 py-3 rounded transition-colors
+              ${isActive 
+                ? 'bg-[var(--accent)] text-[var(--accent-text)] font-semibold' 
+                : 'text-[var(--text-secondary)] hover:bg-[var(--bg-secondary)] hover:text-[var(--text-primary)]'
+              }
+            `}
+          >
+            {({ isActive }) => (
+              <>
+                <item.icon className={`w-5 h-5 mr-3`} />
+                <span className="text-sm">{item.label}</span>
+              </>
+            )}
+          </NavLink>
+        ))}
       </nav>
+
+      {/* System Status Indicator */}
+      <div className="p-6 mt-auto">
+        <div className="mono-card p-4 flex items-center gap-3">
+          <Activity className={`w-5 h-5 ${status.systemMode === 'EMERGENCY' ? 'text-[var(--error)] animate-pulse' : 'text-[var(--success)]'}`} />
+          <div>
+            <p className="text-xs font-semibold text-[var(--text-secondary)]">System Status</p>
+            <p className={`text-[10px] font-bold tracking-wider mt-0.5 ${status.systemMode === 'EMERGENCY' ? 'text-[var(--error)]' : 'text-[var(--success)]'}`}>
+              {status.systemMode === 'EMERGENCY' ? 'LOCKDOWN' : 'HEALTHY'}
+            </p>
+          </div>
+        </div>
+        <p className="text-center text-[10px] font-medium text-[var(--text-secondary)] mt-4">Aura Retail OS v1.0.0</p>
+      </div>
     </div>
   );
 }
