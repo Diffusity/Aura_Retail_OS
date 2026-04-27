@@ -5,6 +5,7 @@ import KioskDetail from './pages/KioskDetail';
 import Transactions from './pages/Transactions';
 import SimulationConsole from './pages/SimulationConsole';
 import PaymentProviders from './pages/PaymentProviders';
+import KioskEmulator from './pages/KioskEmulator';
 
 export default function App() {
   return (
@@ -16,6 +17,7 @@ export default function App() {
           <Route path="/transactions" element={<Transactions />} />
           <Route path="/simulate" element={<SimulationConsole />} />
           <Route path="/payments" element={<PaymentProviders />} />
+          <Route path="/emulator" element={<KioskEmulator />} />
         </Route>
       </Routes>
     </BrowserRouter>

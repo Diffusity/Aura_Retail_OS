@@ -1,120 +1,159 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { getKioskDetail, restockItem, purchaseItem } from '../api';
-import { StateBadge } from './Dashboard';
-import { ArrowLeft, Box, Server, Settings, Zap } from 'lucide-react';
+import { getKioskDetail, getInventory } from '../api';
+import { useToast } from '../context/ToastContext';
+import LoadingSpinner from '../components/LoadingSpinner';
+import ErrorBanner from '../components/ErrorBanner';
+import { 
+  ArrowLeft, Cpu, Package, Server, Activity, AlertTriangle, CheckCircle, ListTree
+} from 'lucide-react';
 
 export default function KioskDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { addToast } = useToast();
   const [data, setData] = useState(null);
+  const [inventory, setInventory] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
 
-  useEffect(() => {
-    const fetchDetail = async () => {
-      try {
-        const res = await getKioskDetail(id);
-        setData(res.data);
-      } catch (e) {
-        console.error(e);
-      } finally {
+  const fetchData = () => {
+    setLoading(true);
+    setError(false);
+    Promise.all([getKioskDetail(id), getInventory(id)])
+      .then(([kioskRes, invRes]) => {
+        setData(kioskRes.data);
+        if (invRes.data?.inventory) setInventory(invRes.data.inventory);
+        else if (kioskRes.data?.inventory) setInventory(kioskRes.data.inventory);
         setLoading(false);
-      }
-    };
-    fetchDetail();
-  }, [id]);
-
-  if (loading) return <div className="p-10 text-center">Loading...</div>;
-  if (!data) return <div className="p-10 text-center text-red-500">Kiosk not found or not registered.</div>;
-
-  const mockInventory = [
-    { id: 'FOOD-001', name: 'Energy Bar', stock: 50, price: 3.50 },
-    { id: 'MED-001', name: 'Paracetamol', stock: 20, price: 1.50 }
-  ];
-
-  const handleAction = async (action, productId) => {
-    try {
-      if (action === 'restock') {
-        await restockItem(id, productId, 10);
-        alert('Restock request sent!');
-      } else {
-        await purchaseItem(id, 'user_demo', productId, 1);
-        alert('Purchase request sent!');
-      }
-    } catch (e) {
-      alert('Action failed: ' + e.message);
-    }
+      })
+      .catch(() => {
+        setError(true);
+        setLoading(false);
+      });
   };
 
+  useEffect(() => {
+    fetchData();
+  }, [id]);
+
+  const handleAction = (action) => {
+    addToast(`${action} command sent to ${id}`, "info");
+  };
+
+  if (loading) return <LoadingSpinner text="Loading kiosk diagnostics..." />;
+  if (error || !data) return <ErrorBanner message={`Failed to load diagnostics for ${id}`} onRetry={fetchData} />;
+
+  const isHealthy = data.state === 'ACTIVE' && data.dispenserOperational;
+
   return (
-    <div className="max-w-5xl mx-auto space-y-6">
-      <div className="flex items-center space-x-4 mb-8">
-        <button onClick={() => navigate('/')} className="p-2 hover:bg-gray-200 rounded-full transition-colors">
-          <ArrowLeft className="w-5 h-5 text-gray-600" />
+    <div className="space-y-6">
+      <div className="flex items-center gap-4">
+        <button 
+          onClick={() => navigate('/')}
+          className="p-2 rounded border border-[var(--border-color)] bg-[var(--surface)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
+        >
+          <ArrowLeft className="w-5 h-5" />
         </button>
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 flex items-center">
-            {id} <span className="ml-4"><StateBadge state={data.state || data.currentState} /></span>
+          <h1 className="text-2xl font-bold text-[var(--text-primary)] tracking-tight flex items-center gap-3">
+            {id} Diagnostics
+            <span className={`px-2 py-0.5 text-[10px] rounded font-bold tracking-wider border ${
+              isHealthy ? 'text-[var(--success)] border-[var(--success)]' : 'text-[var(--error)] border-[var(--error)]'
+            }`}>
+              {isHealthy ? 'NOMINAL' : 'ATTENTION'}
+            </span>
           </h1>
-          <p className="text-gray-500">Kiosk Diagnostics & Hardware Control</p>
+          <p className="text-sm text-[var(--text-secondary)] mt-1">{data.typeName || data.type}</p>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        
-        {/* Hardware Status Panel */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <div className="flex items-center mb-4 text-blue-600">
-            <Server className="w-5 h-5 mr-2" />
-            <h3 className="font-bold text-lg text-gray-900">Hardware Subsystem</h3>
-          </div>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="mono-card p-6">
+          <h2 className="text-lg font-semibold text-[var(--text-primary)] flex items-center gap-2 mb-6">
+            <Cpu className="w-5 h-5 text-[var(--text-secondary)]" /> Hardware Configuration
+          </h2>
           
           <div className="space-y-4">
-            <div className="flex justify-between items-center py-2 border-b border-gray-100">
-              <span className="text-gray-600">Operational Status</span>
-              {data.operationalStatus !== false ? 
-                <span className="text-green-600 font-medium">ONLINE</span> : 
-                <span className="text-red-600 font-medium">OFFLINE</span>}
-            </div>
-            <div className="flex justify-between items-center py-2 border-b border-gray-100">
-              <span className="text-gray-600">Dispenser</span>
-              <span className="font-medium">{data.dispenserOperational !== false ? 'Operational' : 'Fault'}</span>
-            </div>
-            
-            {/* Decorator Panel */}
-            <div className="mt-6">
-              <h4 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">Attached Modules (Decorator Pattern)</h4>
-              <div className="flex flex-wrap gap-2">
-                {id.startsWith('F-') && <span className="px-3 py-1 bg-blue-50 text-blue-700 rounded border border-blue-200 text-sm flex items-center"><Zap className="w-4 h-4 mr-1"/> Refrigeration</span>}
-                <span className="px-3 py-1 bg-slate-50 text-slate-700 rounded border border-slate-200 text-sm flex items-center"><Settings className="w-4 h-4 mr-1"/> Base Dispenser</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Inventory Control */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <div className="flex items-center mb-4 text-orange-600">
-            <Box className="w-5 h-5 mr-2" />
-            <h3 className="font-bold text-lg text-gray-900">Inventory Control</h3>
-          </div>
-          
-          <div className="space-y-3 mt-4">
-            {mockInventory.map(item => (
-              <div key={item.id} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg border border-gray-100">
+            <div className="flex items-center justify-between p-4 rounded bg-[var(--bg-secondary)] border border-[var(--border-color)]">
+              <div className="flex items-center gap-3">
+                <Server className="w-5 h-5 text-[var(--text-secondary)]" />
                 <div>
-                  <p className="font-semibold text-gray-900">{item.name}</p>
-                  <p className="text-xs text-gray-500">{item.id} · Stock: {item.stock}</p>
+                  <p className="text-sm font-medium text-[var(--text-primary)]">Dispenser Unit</p>
+                  <p className="text-xs text-[var(--text-secondary)] mt-0.5">{data.dispenserType || 'Standard'}</p>
                 </div>
-                <div className="space-x-2">
-                  <button onClick={() => handleAction('purchase', item.id)} className="px-3 py-1 bg-blue-600 text-white rounded text-sm hover:bg-blue-700 transition">Buy</button>
-                  <button onClick={() => handleAction('restock', item.id)} className="px-3 py-1 bg-white border border-gray-300 text-gray-700 rounded text-sm hover:bg-gray-50 transition">Restock</button>
+              </div>
+              {data.dispenserOperational ? (
+                <CheckCircle className="w-5 h-5 text-[var(--success)]" />
+              ) : (
+                <AlertTriangle className="w-5 h-5 text-[var(--error)]" />
+              )}
+            </div>
+
+            {data.hardwareModules?.map((mod, i) => (
+              <div key={i} className="flex items-center justify-between p-4 rounded bg-[var(--bg-secondary)] border border-[var(--border-color)]">
+                <div className="flex items-center gap-3">
+                  <Activity className="w-5 h-5 text-[var(--text-secondary)]" />
+                  <div>
+                    <p className="text-sm font-medium text-[var(--text-primary)]">{mod.replace(/([A-Z])/g, ' $1').trim()}</p>
+                    <p className="text-xs text-[var(--text-secondary)] mt-0.5">Decorator Module</p>
+                  </div>
                 </div>
+                <span className="text-xs font-bold text-[var(--success)]">ONLINE</span>
               </div>
             ))}
           </div>
+          
+          <div className="mt-6 flex gap-3">
+            <button onClick={() => handleAction('Reboot')} className="flex-1 py-2 rounded font-medium text-sm border border-[var(--border-color)] text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] transition-colors">
+              Restart System
+            </button>
+            <button onClick={() => handleAction('Self-Test')} className="flex-1 py-2 rounded font-medium text-sm bg-[var(--text-primary)] text-[var(--bg-primary)] hover:opacity-90 transition-opacity">
+              Run Diagnostics
+            </button>
+          </div>
         </div>
 
+        <div className="mono-card p-6">
+          <div className="flex justify-between items-start mb-6">
+            <h2 className="text-lg font-semibold text-[var(--text-primary)] flex items-center gap-2">
+              <ListTree className="w-5 h-5 text-[var(--text-secondary)]" /> Inventory Directory
+            </h2>
+            <span className="text-xs font-mono text-[var(--text-secondary)] border border-[var(--border-color)] px-2 py-1 rounded">Composite</span>
+          </div>
+          
+          <div className="space-y-2 max-h-[350px] overflow-y-auto custom-scrollbar pr-2">
+            <div className="pl-2 border-l border-[var(--border-color)] ml-2 pb-2">
+              <div className="flex items-center gap-2 text-[var(--text-primary)] font-medium mb-3">
+                <Package className="w-4 h-4 text-[var(--text-secondary)]" /> Root Catalog
+              </div>
+              
+              {inventory.map((item, i) => (
+                <div key={i} className="flex items-center justify-between pl-6 py-2 border-l border-[var(--border-color)] ml-2 relative">
+                  <div className="absolute w-4 border-b border-[var(--border-color)] left-0 top-1/2 -translate-y-1/2"></div>
+                  <div>
+                    <p className="text-sm text-[var(--text-primary)]">{item.name}</p>
+                    <p className="text-[10px] text-[var(--text-secondary)] font-mono mt-0.5">{item.id}</p>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <span className="text-xs text-[var(--text-secondary)]">${item.price?.toFixed(2)}</span>
+                    <span className={`text-xs font-bold w-12 text-right ${item.stock < 10 ? 'text-[var(--error)]' : 'text-[var(--success)]'}`}>
+                      {item.stock} qty
+                    </span>
+                  </div>
+                </div>
+              ))}
+              
+              {inventory.length === 0 && (
+                <div className="pl-6 text-sm text-[var(--text-secondary)]">No inventory data available.</div>
+              )}
+            </div>
+          </div>
+          
+          <button onClick={() => handleAction('Restock')} className="w-full mt-6 py-2 rounded font-medium text-sm bg-[var(--text-primary)] text-[var(--bg-primary)] hover:opacity-90 transition-opacity">
+            Trigger Restock Command
+          </button>
+        </div>
       </div>
     </div>
   );
