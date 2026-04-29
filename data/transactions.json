@@ -52,6 +52,16 @@
     "txnId": "e7b4e7e3-0b8e-4719-8911-c8ed7a3a4276",
     "status": "COMPLETED",
     "timestamp": 1777140980969
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
+=======
+<<<<<<< main
+=======
+>>>>>>> Stashed changes
+=======
+<<<<<<< main
+=======
+>>>>>>> Stashed changes
   },
   {
     "amount": 3.15,
@@ -61,5 +71,24 @@
     "txnId": "b1f664f6-f757-46ec-a596-9adc2bcb6bcf",
     "status": "COMPLETED",
     "timestamp": 1777201345011
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
+=======
+=======
+>>>>>>> Stashed changes
+  },
+  {
+    "amount": 3.15,
+    "productId": "FOOD-001",
+    "qty": 1,
+    "userId": "CUST-2618",
+    "txnId": "d87e6972-4bad-4e36-8ff5-9e25ec73dea0",
+    "status": "COMPLETED",
+    "timestamp": 1777399022998
+>>>>>>> local
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
+>>>>>>> Stashed changes
   }
 ]
