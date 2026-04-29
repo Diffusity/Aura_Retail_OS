@@ -1,52 +1,109 @@
-# Aura Retail OS
+# 🌌 Aura Retail OS
 
-This project implements the **Aura Retail OS** — a modular, OOP-driven autonomous retail kiosk system. This implementation focuses on the Path B objective (Modular Hardware Platform).
+> **Modular, OOP-driven Autonomous Retail Kiosk System**
+>
+> Aura Retail OS is a state-of-the-art software platform designed for the next generation of autonomous retail kiosks. Built with a focus on **Path B (Modular Hardware Platform)**, it enables dynamic hardware integration, unified payment processing, and hierarchical inventory management through rigorous application of Object-Oriented Programming principles.
 
-## Prerequisites
+--
 
-To compile and run the simulations, ensure your system has the following installed:
+## 🚀 Project Overview
 
-- **Java Development Kit (JDK):** Version 17 or higher.
-- **Apache Maven:** Version 3.6+ (for building and dependency management).
-- **Terminal/Command Prompt:** To execute the Maven goals.
+The Aura Retail OS treats the kiosk as a **long-term hardware platform**. Our architecture addresses the critical failures of monolithic systems by prioritizing:
+- **Scalability**: Swapping hardware implementations without touching high-level logic.
+- **Flexibility**: Attaching new hardware modules (Refrigeration, Solar, Network) at runtime.
+- **Reliability**: Atomic transactions with full rollback support.
+- **Security**: Hierarchical access control for all inventory and hardware operations.
 
-## How to Run the Simulations
+--
 
-The project includes predefined simulation scenarios highlighting the core architecture and various design patterns implemented.
+## 🏗️ Core Architecture
 
-First, navigate to the root directory `d:\OOPs_project` and compile the codebase:
-```bash
-mvn clean compile
+The system is divided into five specialized subsystems, communicating through strict interface contracts:
+
+```mermaid
+graph TD
+    subgraph "Aura Retail OS"
+        KC[Kiosk Core] <--> HL[Hardware Layer]
+        KC <--> IS[Inventory System]
+        KC <--> PS[Payment System]
+        KC --> CM[City Monitoring]
+    end
+    
+    style KC fill:#f9f,stroke:#333,stroke-width:2px
+    style HL fill:#bbf,stroke:#333,stroke-width:1px
+    style IS fill:#bfb,stroke:#333,stroke-width:1px
+    style PS fill:#fbb,stroke:#333,stroke-width:1px
+    style CM fill:#eee,stroke:#333,stroke-width:1px
 ```
 
-Once compiled, you can run the simulations using the `exec:java` Maven plugin depending on which scenario you want to test.
+1.  **Kiosk Core**: Manages state transitions, command execution, and the primary facade.
+2.  **Hardware Layer**: Abstraction for dispensers and optional environmental modules.
+3.  **Inventory System**: Handles products and nested product bundles (Composite).
+4.  **Payment System**: Unifies diverse 3rd-party APIs through a common adapter.
+5.  **City Monitoring**: Event-driven observation for maintenance and supply chain logistics.
 
-### Scenario A: Adding a New Hardware Module (Decorator + Bridge)
-Demonstrates dynamically adding a hardware module (Refrigeration and Solar) via the **Decorator** pattern, and swapping out the underlying hardware dispenser implementation via the **Bridge** pattern.
+--
+
+## 🛠️ Getting Started
+
+### Backend Setup (Java 17 + Maven)
+
+1. **Compile the project**:
+   ```bash
+   mvn clean compile
+   ```
+
+2. **Run the API Server**:
+   ```bash
+   mvn exec:java -Dexec.mainClass="aura.ApiServer"
+   ```
+   *The server will start at `http://localhost:8080`.*
+
+### Frontend Dashboard (React + Vite)
+
+1. **Navigate to the frontend directory**:
+   ```bash
+   cd frontend
+   ```
+
+2. **Install dependencies**:
+   ```bash
+   npm install
+   ```
+
+3. **Start the development server**:
+   ```bash
+   npm run dev
+   ```
+
+--
+
+## 🧪 Simulation Scenarios
+
+The project includes predefined simulation scenarios highlighting the core architecture:
+
+### 🔹 Scenario A: Modular Hardware
+Demonstrates dynamically adding hardware modules (Refrigeration and Solar) via the **Decorator** pattern and swapping dispenser implementations at runtime via the **Bridge** pattern.
 ```bash
 mvn exec:java -Dexec.mainClass="aura.simulation.ScenarioA_NewHardwareModule"
 ```
 
-### Scenario B: Integrating a New Payment Provider (Adapter)
-Demonstrates the **Adapter** pattern by registering a completely new third-party payment provider API (Crypto) at runtime and successfully processing a transaction. 
+### 🔹 Scenario B: Payment Integration
+Showcases the **Adapter** pattern by registering a new third-party payment provider (Crypto) at runtime without modifying existing core logic.
 ```bash
 mvn exec:java -Dexec.mainClass="aura.simulation.ScenarioB_NewPaymentProvider"
 ```
 
-### Scenario C: Nested Bundle Inventory Expansion (Composite)
-Demonstrates the **Composite** pattern by creating an N-level deep inventory hierarchy (products inside bundles) and showing how attributes like stock levels and discounts propagate recursively.
+### 🔹 Scenario C: Nested Bundles
+Demonstrates the **Composite** pattern by creating deep inventory hierarchies (e.g., Med Kit inside an Emergency Kit) and propagating stock/discount attributes.
 ```bash
 mvn exec:java -Dexec.mainClass="aura.simulation.ScenarioC_NestedBundles"
 ```
 
-### Complete Subtask 2 Demo
-Runs the end-to-end integration demo showcasing transactions, state transitions, subsystem interactions, the command invoker, and error handling.
+### 🔹 Full System Demo
+Runs an end-to-end integration demo showcasing transactions, state transitions, and error handling.
 ```bash
 mvn exec:java -Dexec.mainClass="aura.simulation.SubTask2Demo"
 ```
 
-### Foundation Layer Tests
-Runs foundational validation and checks persistence loading.
-```bash
-mvn exec:java -Dexec.mainClass="aura.simulation.FoundationTest"
-```
+--
